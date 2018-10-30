@@ -1,6 +1,7 @@
 
 
-class assignment:
+class Assignment:
+
     def calculate_distance(self, a, b):
         return (b - a)
 
