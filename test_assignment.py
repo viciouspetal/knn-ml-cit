@@ -8,7 +8,7 @@ class TestAssignment(unittest.TestCase):
         under_test = Assignment()
         result = under_test.calculate_distance(6, 10)
         print('test value is {0}'.format(result))
-        self.assertEquals(result, 4)
+        self.assertEqual(result, 4)
 
 
 if __name__ == '__main__':
