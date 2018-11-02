@@ -124,7 +124,6 @@ class Assignment:
         return df_training, rows_removed
 
 
-
 if __name__ == '__main__':
     subject = Assignment()
     subject.main()
