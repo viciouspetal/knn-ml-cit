@@ -12,16 +12,6 @@ class TestAssignment(unittest.TestCase):
     def setUpClass(cls):
         TestAssignment.trainingDf = pd.read_csv(Assignment.path_to_cancer_training, names=Assignment.cancer_dataset_column_headers, header=None)
 
-    def test_calculate_distance_when_end_larger_than_start_then_distance_is_calculated(self):
-        under_test = Assignment()
-        result, sorted = under_test.calculate_distances(TestAssignment.trainingDf.values, TestAssignment.trainingDf.values)
-
-        #print('resulting array is {0}'. format(result))
-
-        result_elements_that_are_ot_zero = np.where(~result.any(axis=0))[0]
-        self.assertEqual(result_elements_that_are_ot_zero[0], 0)
-        self.assertEqual(len(result), 514)
-
     def test_load_data_when_loading_training_data_then_the_count_is_correct(self):
         expected_count = 514
         under_test = Assignment()
@@ -43,6 +33,25 @@ class TestAssignment(unittest.TestCase):
         under_test = Assignment()
 
         self.assertEqual(75, under_test.compute_accuracy(75, 25))
+
+    def test_calculate_distance_when_1_query_instance_provided_then_distance_matrix_is_calculated_and_sorted(self):
+        under_test = Assignment()
+        result, sorted_result_indices = under_test.calculate_distances(TestAssignment.trainingDf.values, TestAssignment.trainingDf.values[0])
+
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(sorted_result_indices)
+        self.assertEqual(514, len(result))
+        self.assertEqual(513, len(sorted_result_indices))
+
+    def test_calculate_distance_when_same_data_is_fed_twice_then_resulting_distances_are_zeroed_out(self):
+        under_test = Assignment()
+        result, sorted = under_test.calculate_distances(TestAssignment.trainingDf.values, TestAssignment.trainingDf.values)
+
+        #print('resulting array is {0}'. format(result))
+
+        result_elements_that_are_ot_zero = np.where(~result.any(axis=0))[0]
+        self.assertEqual(result_elements_that_are_ot_zero[0], 0)
+        self.assertEqual(len(result), 514)
 
 
 if __name__ == '__main__':

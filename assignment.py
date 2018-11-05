@@ -9,20 +9,20 @@ class Assignment:
     path_to_test=path_to_cancer+'/testData2.csv'
     cancer_dataset_column_headers = ['bi_rads', 'age', 'shape', 'margin', 'density', 'severity']
 
-    def calculate_distances(self, datapoints, query_instance):
+    def calculate_distances(self, data_points, query_instance):
         """
         Calculates a distance matrix for each of the records detailing how far each datapoint is from a given query instance.
         Additionally computes a sorted array detailing indices of the smallest to largest distance from a given
         query point, from smallest (or closest point to query instance) to largest.
 
-        :param datapoints: datapoints of a given dataset
+        :param data_points: data points of a given dataset
         :param query_instance: instance of a dataset for which the distance matrix will be computed for
         :return:
         """
 
         # row wise sum with a negative lookahead - starts at the 2nd last column - ignores the last column which in
         # this instance is the actual recorded classification
-        distance_matrix = np.sqrt(((datapoints - query_instance) ** 2).sum(-1))
+        distance_matrix = np.sqrt(((data_points - query_instance) ** 2).sum(-1))
 
         # sorts the distance matrix and returns indices of elements from smallest distance value to largest
         sorted_distance_matrix = np.argsort(distance_matrix)[np.in1d(np.argsort(distance_matrix),np.where(distance_matrix),1)]
@@ -38,12 +38,18 @@ class Assignment:
         df = pd.read_csv(path, names=self.cancer_dataset_column_headers, header=None)
         return df
 
-    def main(self):
-        # first need to load the training dataset
-        df_training = self.load_data(self.path_to_cancer_training)
-        df_training, rows_count_removed = self.clean_dataset(df_training)
+    def main(self, path=path_to_cancer_training):
+        """
+        Directs the analysis process by orchestrating calls to relevant pieces of the KNN algorithm implementation
 
-        print('The dataset has been cleaned of the impossible values. {0} rows have been removed'.format(rows_count_removed))
+        :param path: path to file to be analyzed. Default value is assumed to correspond to trainingData2.csv
+        in cancer directory
+        """
+        # first need to load the training dataset
+        df_training = self.load_data(path)
+        df_training, row_count_removed = self.clean_dataset(df_training)
+
+        print('The dataset has been cleaned of the impossible values. {0} rows have been removed'.format(row_count_removed))
 
         k_value = 3
         correctly_classified = 0
@@ -51,9 +57,9 @@ class Assignment:
 
         # passing pandas dataframe converted into a numpy array as well as each query instance in the dataset to calculate distance matrix
         for index, row in df_training.iterrows():
-            dist, sorted = self.calculate_distances(df_training.values, row.values)
+            dist_matrix, sorted_matrix_indices = self.calculate_distances(df_training.values, row.values)
 
-            classification  = self.classify_points(df_training, sorted, k_value)
+            classification  = self.classify_points(df_training, sorted_matrix_indices, k_value)
 
             if classification == row.values[5]:
                 correctly_classified += 1
