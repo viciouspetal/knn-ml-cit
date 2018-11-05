@@ -7,7 +7,7 @@ class Q3:
     path_to_test = path_to_folder + '/testData.csv'
 
     def main(self):
-        training_data = cu.load_data(self.path_to_test, None)
+        training_data = cu.load_data(self.path_to_training_file, None)
         # print('Training data shape {0}'.format(data.shape))
         # print(data.describe())
 
@@ -25,8 +25,19 @@ class Q3:
         #print(prediction_values)
 
         # epsilon = residual, defined as sum of all residuals squared. Residual = actual value - predicted value
-        epsilon= np.square(training_data[12] - prediction_values).sum()
+        epsilon = np.square(training_data[12] - prediction_values).sum()
         print('Epsilon is {0}'.format(epsilon))
+
+        # total sum of squares (TSS) = ((y_average - y_predicted) ^2 ).sum()
+        average_of_training_data = np.average(training_data[12])
+
+        tss = np.square(average_of_training_data-prediction_values).sum()
+        print('TSS is {0}'. format(tss))
+
+        accuracy = 1 - (epsilon/tss)
+        print('R squared coefficient is {0}'. format(accuracy))
+        print('Accuracy of the model is: {0}'.format(accuracy*100))
+
 
     def calculate_regression(self, data_points, sorted_dist_indices, k_value):
         closest_neighbours = sorted_dist_indices[:k_value]
