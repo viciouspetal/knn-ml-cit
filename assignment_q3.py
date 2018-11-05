@@ -21,7 +21,12 @@ class Q3:
             dist_matrix, sorted_matrix_indices = cu.calculate_distances(training_data.values, row.values)
 
             prediction_values.append(self.calculate_regression(training_data, sorted_matrix_indices, 5))
-        print(prediction_values)
+        #print(training_data)
+        #print(prediction_values)
+
+        # epsilon = residual, defined as sum of all residuals squared. Residual = actual value - predicted value
+        epsilon= np.square(training_data[12] - prediction_values).sum()
+        print('Epsilon is {0}'.format(epsilon))
 
     def calculate_regression(self, data_points, sorted_dist_indices, k_value):
         closest_neighbours = sorted_dist_indices[:k_value]
