@@ -1,8 +1,9 @@
 import unittest
 import pandas as pd
 import numpy as np
+import common_utils as cu
 
-from assignment import Assignment
+from assignment_q1 import Assignment
 
 
 class TestAssignment(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestAssignment(unittest.TestCase):
     def test_load_data_when_loading_training_data_then_the_count_is_correct(self):
         expected_count = 514
         under_test = Assignment()
-        result = under_test.load_data(under_test.path_to_cancer_training)
+        result = cu.load_data(under_test.path_to_cancer_training, Assignment.cancer_dataset_column_headers)
         self.assertEqual(expected_count, len(result))
 
     def test_clean_dataset_when_invalid_records_present_then_they_are_removed(self):
