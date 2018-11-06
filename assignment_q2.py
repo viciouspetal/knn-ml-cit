@@ -64,17 +64,17 @@ class Q2:
 
         return dist, sorted_indices
 
-    def main(self, path_to_data=path_to_cancer_training, headers= cancer_dataset_column_headers, k_value=3, alg_to_use='euclidean'):
+    def main(self, path_to_data=path_to_cancer_training, headers= cancer_dataset_column_headers, k_value=3, alg_to_use='euclidean', p=1):
         data_points = cu.load_data(path_to_data, headers)
         df_training, row_count_removed = cu.clean_cancer_dataset(data_points)
 
-       # print('The dataset has been cleaned of the impossible values. {0} rows have been removed'.format(row_count_removed))
+        print('The dataset has been cleaned of the impossible values. {0} rows have been removed'.format(row_count_removed))
 
         correctly_classified = 0
         incorrectly_classified = 0
 
         for index, row in data_points.iterrows():
-            dist_matrix, sorted_matrix_indices = self.calculate_distances(data_points.loc[:,'bi_rads':'density'].values, row[0:5].values, alg_to_use)
+            dist_matrix, sorted_matrix_indices = self.calculate_distances(data_points.loc[:,'bi_rads':'density'].values, row[0:5].values, alg_to_use, p)
 
             classification = self.classify_points_with_weight(dist_matrix, sorted_matrix_indices, data_points.values, k_value)
 
@@ -92,11 +92,14 @@ class Q2:
         k_target = 10
         distance_algs = ['euclidean', 'manhattan', 'minkowski']
 
-        data = []
-
         for alg in distance_algs:
             for k in range(1, k_target+1):
-                data.append(self.main(path_to_data, k_value=k, alg_to_use=alg))
+                self.main(path_to_data, k_value=k, alg_to_use=alg)
+
+    def best_mink(self, path_to_data, k_target = 10, p_target=10):
+        for k in range(1, k_target+1):
+            for p in range(1, p_target+1):
+                self.main(path_to_data, k_value=k, alg_to_use='minkowski', p=p)
 
 
 if __name__ == '__main__':
@@ -110,6 +113,9 @@ if __name__ == '__main__':
     elif args.run == 'test':
         subject.main(subject.path_to_test)
     elif args.run == 'best':
-        subject.best_params(subject.path_to_test)
+        #subject.best_params(subject.path_to_test)
+        subject.best_params(subject.path_to_cancer_training)
+    elif args.run == 'mink':
+        subject.best_mink(subject.path_to_test, 10)
     else:
         subject.main(subject.path_to_test)

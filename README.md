@@ -42,15 +42,24 @@ and to run same script against training dataset one would use:
 
 ```python assignment_q1.py --run training```
 
-Those operations are supported for all files. Furthermore if ```-run``` parameter is omitted then script selected will run against test dataset by default
+Those operations are supported for all files. Furthermore if ```--run``` parameter is omitted then script selected will run against test dataset by default
 
-### Additional param for weighted kNN
-For ```python assignment_q2.py``` alone there is an extra ```-run``` parameter value accepted called ```best```, which cycles through values of K from 1 to 10 (inclusive) and through 3 different distance algorithms:
+### Additonal parameter for weighted kNN and kNN regression
+For ```python assignment_q2.py``` as well as ```python assignment_q3.py``` there is an extra ```--run``` parameter value accepted called - ```best``` 
+"Best" will cycle through values of K from 1 to 10 (inclusive) and through 3 different distance algorithms:
 - Euclidean
 - Manhattan
 - Minkowski
 
-and print resulting accuracy values, per k, per distance algorithm, to the console.
+for the test dataset and prints resulting accuracy values, per k, per distance algorithm, to the console.
 
 Complete command would look like
 ```python assignment_q2.py --run best```
+or
+```python assignment_q3.py --run best```
+
+### Additional parameters for weighted kNN
+For the ```python assignment_q2.py``` alone there
+#### ```--run mink```
+"Mink" param when supplied to the run parameter will cycle through a number of k and p values and execute analysis on test data using Minkowski distance algorithm
+```python assignment_q2.py --run mink```
