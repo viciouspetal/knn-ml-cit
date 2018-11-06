@@ -1,5 +1,6 @@
 import numpy as np
 import common_utils as cu
+import argparse
 
 class Q2:
     path_to_cancer = './dataset/cancer'
@@ -73,7 +74,7 @@ class Q2:
         incorrectly_classified = 0
 
         for index, row in data_points.iterrows():
-            dist_matrix, sorted_matrix_indices = self.calculate_distances(data_points.values, row.values, alg_to_use)
+            dist_matrix, sorted_matrix_indices = self.calculate_distances(data_points.loc[:,'bi_rads':'density'].values, row[0:5].values, alg_to_use)
 
             classification = self.classify_points_with_weight(dist_matrix, sorted_matrix_indices, data_points.values, k_value)
 
@@ -99,6 +100,16 @@ class Q2:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run",  help="Runs the classification on either training or test dataset. Allowed values: training, test")
+
+    args = parser.parse_args()
     subject = Q2()
-    subject.main(subject.path_to_test)
-    #subject.best_params(subject.path_to_test)
+    if args.run == 'training':
+        subject.main(subject.path_to_cancer_training)
+    elif args.run == 'test':
+        subject.main(subject.path_to_test)
+    elif args.run == 'best':
+        subject.best_params(subject.path_to_test)
+    else:
+        subject.main(subject.path_to_test)

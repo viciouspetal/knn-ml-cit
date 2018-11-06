@@ -1,6 +1,7 @@
 import numpy as np
 import operator
 import common_utils as cu
+import argparse
 
 
 class Q1:
@@ -46,7 +47,7 @@ class Q1:
 
         # passing pandas dataframe converted into a numpy array as well as each query instance in the dataset to calculate distance matrix
         for index, row in df_training.iterrows():
-            dist_matrix, sorted_matrix_indices = cu.calculate_distances(df_training.values, row.values)
+            dist_matrix, sorted_matrix_indices = cu.calculate_distances(df_training.loc[:,'bi_rads':'density'].values, row[0:5].values)
 
             classification = self.classify_points(df_training, sorted_matrix_indices, k_value)
 
@@ -86,5 +87,16 @@ class Q1:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run",  help="Runs the classification on either training or test dataset. Allowed values: training, test")
+
+    args = parser.parse_args()
     subject = Q1()
-    subject.main()
+    if args.run == 'training':
+        subject.main(subject.path_to_cancer_training)
+    elif args.run == 'test':
+        subject.main(subject.path_to_test)
+    else:
+        subject.main(subject.path_to_test)
+
+

@@ -1,5 +1,6 @@
 import numpy as np
 import common_utils as cu
+import argparse
 
 
 class Q3:
@@ -7,13 +8,13 @@ class Q3:
     path_to_training_file = path_to_folder + '/trainingData.csv'
     path_to_test = path_to_folder + '/testData.csv'
 
-    def main(self, path_to_dataset, k_value):
+    def main(self, path_to_dataset, k_value=5):
         data_points = cu.load_data(path_to_dataset, None)
 
         prediction_values = [] #initializing container for values predicted
 
         for index, row in data_points.iterrows():
-            dist_matrix, sorted_matrix_indices = cu.calculate_distances(data_points.values, row.values)
+            dist_matrix, sorted_matrix_indices = cu.calculate_distances(data_points.loc[:,0:11].values, row[0:12].values)
 
             prediction_values.append(self.calculate_regression(data_points, sorted_matrix_indices, k_value))
 
@@ -42,7 +43,7 @@ class Q3:
         #print('Total sum of squares (TSS) is {0}'. format(tss))
 
         r2_score = 1 - (ssr/tss)
-        print('R\u00b2 coefficient is {0}'. format(r2_score))
+        print('R\u00b2 (R squared) coefficient is {0}'. format(r2_score))
         print('Accuracy of the model is: {0} %'.format(r2_score * 100))
         return r2_score
 
@@ -69,5 +70,16 @@ class Q3:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run",  help="Runs the classification on either training or test dataset. Allowed values: training, test")
+    parser.add_argument("--k_value",  help="Runs the classification on either training or test dataset. Allowed values: training, test")
+
+    args = parser.parse_args()
     subject = Q3()
-    subject.main(subject.path_to_training_file, 5)
+
+    if args.run == 'training':
+        subject.main(subject.path_to_training_file)
+    elif args.run == 'test':
+        subject.main(subject.path_to_test)
+    else:
+        subject.main(subject.path_to_test)

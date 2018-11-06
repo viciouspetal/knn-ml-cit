@@ -30,4 +30,27 @@ Each ```assignment_x``` file should be run individually. Depending on target pyt
 
 ```python assignment_q3.py```
 
-No commandline arguments are supported at this time.
+Each file can be executed with a ```-run ``` parameter where the accepted values are:
+- training - runs given script against training dataset
+- test - runs given script against test dataset
+
+For example, to run ```python assignment_q1.py``` against test dataset one would use:
+
+```python assignment_q1.py --run test```
+
+and to run same script against training dataset one would use:
+
+```python assignment_q1.py --run training```
+
+Those operations are supported for all files. Furthermore if ```-run``` parameter is omitted then script selected will run against test dataset by default
+
+### Additional param for weighted kNN
+For ```python assignment_q2.py``` alone there is an extra ```-run``` parameter value accepted called ```best```, which cycles through values of K from 1 to 10 (inclusive) and through 3 different distance algorithms:
+- Euclidean
+- Manhattan
+- Minkowski
+
+and print resulting accuracy values, per k, per distance algorithm, to the console.
+
+Complete command would look like
+```python assignment_q2.py --run best```
