@@ -1,9 +1,10 @@
 import numpy as np
-import pandas as pd
 import operator
+import common_utils as cu
+import argparse
 
 
-class Assignment:
+class Q1:
     path_to_cancer = './dataset/cancer'
     path_to_cancer_training = path_to_cancer + '/trainingData2.csv'
     path_to_test=path_to_cancer+'/testData2.csv'
@@ -28,17 +29,7 @@ class Assignment:
         sorted_distance_matrix = np.argsort(distance_matrix)[np.in1d(np.argsort(distance_matrix),np.where(distance_matrix),1)]
         return distance_matrix, sorted_distance_matrix
 
-    def load_data(self, path):
-        """
-        Loads a given dataset with given headers
-
-        :param path: paths to dataset
-        :return: dataset with headers loaded in a pandas dataframe
-        """
-        df = pd.read_csv(path, names=self.cancer_dataset_column_headers, header=None)
-        return df
-
-    def main(self, path=path_to_cancer_training):
+    def main(self, path=path_to_cancer_training, k_value=3):
         """
         Directs the analysis process by orchestrating calls to relevant pieces of the KNN algorithm implementation
 
@@ -46,41 +37,28 @@ class Assignment:
         in cancer directory
         """
         # first need to load the training dataset
-        df_training = self.load_data(path)
-        df_training, row_count_removed = self.clean_dataset(df_training)
+        df_training = cu.load_data(path, self.cancer_dataset_column_headers)
+        df_training, row_count_removed = cu.clean_cancer_dataset(df_training)
 
         print('The dataset has been cleaned of the impossible values. {0} rows have been removed'.format(row_count_removed))
 
-        k_value = 3
         correctly_classified = 0
         incorrectly_classified = 0
 
         # passing pandas dataframe converted into a numpy array as well as each query instance in the dataset to calculate distance matrix
         for index, row in df_training.iterrows():
-            dist_matrix, sorted_matrix_indices = self.calculate_distances(df_training.values, row.values)
+            dist_matrix, sorted_matrix_indices = cu.calculate_distances(df_training.loc[:,'bi_rads':'density'].values, row[0:5].values)
 
-            classification  = self.classify_points(df_training, sorted_matrix_indices, k_value)
+            classification = self.classify_points(df_training, sorted_matrix_indices, k_value)
 
             if classification == row.values[5]:
                 correctly_classified += 1
             else:
                 incorrectly_classified += 1
 
-        accuracy = self.compute_accuracy(correctly_classified, incorrectly_classified)
+        accuracy = cu.compute_classification_accuracy(correctly_classified, incorrectly_classified)
 
         print('Accuracy is: ', accuracy, '%')
-
-    def compute_accuracy(self, correctly_classified, incorrectly_classified):
-        """
-        Computes the accuracy of the model based on the number of correctly and incorrectly classified points.
-        Expresses accuracy as a percentage value.
-
-        :param correctly_classified: count of correctly classified data points
-        :param incorrectly_classified: count of incorrectly classified data points
-        :return: accuracy score
-        """
-        accuracy = (correctly_classified / (correctly_classified + incorrectly_classified)) * 100
-        return accuracy
 
     def classify_points(self, dataset, sorted_dist_array, k_value):
         """
@@ -107,29 +85,18 @@ class Assignment:
 
         return max(votes.items(), key=operator.itemgetter(1))[0]
 
-    def clean_dataset(self, df_training):
-        """
-        Checks and cleans the dataset of any potential impossible values, e.g. bi-rads columns, the 1st only allows
-        values in the range of 1-5, ordinal
-        Age, 2nd column, cannot be negative, integer
-        Shape, 3rd column, only allows values between 1 and 4, nominal
-        Margin, only allows a range of 1 to 5, nominal
-        Density only allows values between 1-4,ordinal.
-
-        All deletions will be performed in place.
-        :return: cleaned up dataframe, count of removed points
-        """
-        rows_pre_cleaning = df_training.shape[0]
-
-        df_training.drop(df_training.index[df_training['bi_rads'] > 5], inplace=True)
-        df_training.drop(df_training.index[df_training['shape'] > 4], inplace=True)
-        df_training.drop(df_training.index[df_training['margin'] > 5], inplace=True)
-        df_training.drop(df_training.index[df_training['density'] > 4], inplace=True)
-
-        rows_removed = rows_pre_cleaning - df_training.shape[0]
-        return df_training, rows_removed
-
 
 if __name__ == '__main__':
-    subject = Assignment()
-    subject.main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run",  help="Runs the classification on either training or test dataset. Allowed values: training, test")
+
+    args = parser.parse_args()
+    subject = Q1()
+    if args.run == 'training':
+        subject.main(subject.path_to_cancer_training)
+    elif args.run == 'test':
+        subject.main(subject.path_to_test)
+    else:
+        subject.main(subject.path_to_test)
+
+
